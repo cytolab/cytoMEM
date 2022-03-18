@@ -20,4 +20,4 @@ Depends:
 Suggests: knitr,
     rmarkdown
 VignetteBuilder: knitr
-URL: https://github.com/cytolab/mem
+URL: https://github.com/cytolab/cytoMEM
