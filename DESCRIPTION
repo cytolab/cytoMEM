@@ -1,0 +1,23 @@
+Package: cytoMEM
+Type: Package
+Title: Marker Enrichment Modeling (MEM)
+Version: 0.99.0
+Authors@R: c(person("Sierra","Lima", role = c("aut"),
+  		email = "sierrambarone@gmail.com",
+  		comment = c(ORCID = "0000-0001-5944-750X")),   
+		person("Kirsten","Diggins", role = c("aut"),
+  		comment = c(ORCID = "0000-0003-1622-0158")),
+		person("Jonathan","Irish", role = c("aut","cre"),
+  		email = "jonathan.irish@vanderbilt.edu",
+  		comment = c(ORCID = "0000-0001-9428-8866")))
+Description: MEM, Marker Enrichment Modeling, automatically generates and displays quantitative labels for cell populations that have been identified from single-cell data. The input for MEM is a dataset that has pre-clustered or pre-gated populations with cells in rows and features in columns. Labels convey a list of measured features and the features' levels of relative enrichment on each population. MEM can be applied to a wide variety of data types and can compare between MEM labels from flow cytometry, mass cytometry, single cell RNA-seq, and spectral flow cytometry using RMSD.
+License: GPL-3
+Imports: gplots, tools, flowCore, grDevices, stats, utils, matrixStats, methods
+Collate: 'MEM_function.R''create_labels_txt.R''IQR_thresh.R''build_heatmaps.R''add_cluster_ID.R''add_fileID_to_clusterID.R''choose_reference_pop.R''choose_markers.R''create_labels.R''format_data.R''get_files.R''rename_markers.R''MEM_RMSD.R''zero_reference.R'
+biocViews: Proteomics, SystemsBiology, Classification, FlowCytometry, DataRepresentation, DataImport, CellBiology, SingleCell, Clustering
+Depends:
+    R (>= 4.1)
+Suggests: knitr,
+    rmarkdown
+VignetteBuilder: knitr
+URL: https://github.com/cytolab/mem
