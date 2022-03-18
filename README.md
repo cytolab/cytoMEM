@@ -6,7 +6,7 @@ Marker Enrichment Modeling (MEM) is a tool designed to calculate enrichment scor
 
 if (!require("BiocManager", quietly = TRUE))  
         install.packages("BiocManager")  
-        BiocManager::install("MEM")
+        BiocManager::install("cytoMEM")
 
 ### Citation
 
