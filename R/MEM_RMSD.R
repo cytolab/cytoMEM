@@ -39,7 +39,7 @@ MEM_RMSD <-
                 }
             }
         } else{
-            if (is(MEM_matrix)[1] == "list") {
+            if (is(MEM_matrix,"list")) {
                 MEM_scores = MEM_matrix[[5]][[1]]
             } else{
                 MEM_scores = MEM_matrix

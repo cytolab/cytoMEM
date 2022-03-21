@@ -7,17 +7,18 @@ MEM <- function(exp_data, transform=FALSE, cofactor=1, choose.markers=FALSE,mark
     if(missing(exp_data)){
         warning("Data not found. See documentation for accepted data types",call.=FALSE)
     }
-    if(is(exp_data)[1] == "character" && missing(file.is.clust) && length(exp_data) > 1){
+    if(is(exp_data,"character") && missing(file.is.clust) && length(exp_data) > 1){
         warning("There are multiple files. Please specify if each file is cluster using file.is.clust arg",call.=FALSE)
         return(exp_data)
     }
-    if(is(exp_data)[1] != "character" && is(exp_data)[1] != "matrix" && is(exp_data)[1] != "data.frame"){
+    if(is(exp_data,"character") || is(exp_data,"matrix") || is(exp_data,"data.frame")){
+      }else{
         warning("Incorrect data type. See documentation for accepted data types",call.=FALSE)
         return(exp_data)
     }
 
     #Check to see if there are multiple file types in folder
-    if(is(exp_data)[1] == "character"){
+    if(is(exp_data,"character")){
         all_exts = lapply(exp_data,file_ext)
         if(isTRUE(all.equal(all_exts,rep(all_exts[1],length(all_exts))))==FALSE){
             warning("Directory contains multiple file types. Remove all files except those to be included in analysis",call. = FALSE)
@@ -26,12 +27,12 @@ MEM <- function(exp_data, transform=FALSE, cofactor=1, choose.markers=FALSE,mark
     }
 
     # If user has input multiple files, call get.files; else read in data based on ext type
-    if(is(exp_data)[1] == "character" && length(exp_data) > 1){
+    if(is(exp_data,"character") && length(exp_data) > 1){
         exp_data <- exp_data[ !grepl("output files",exp_data)]
 
         exp_data = format.data(exp_data,file.is.clust,add.fileID)
 
-    } else if(is(exp_data)[1] == "matrix" || is(exp_data)[1] == "data.frame") {
+    } else if(is(exp_data,"matrix") || is(exp_data,"data.frame")) {
         exp_data = as.data.frame(exp_data)
 
     } else {
