@@ -7,15 +7,15 @@ build_heatmaps <-
              output.files = FALSE,
              labels = FALSE,
              only.MEMheatmap = FALSE) {
-        dendro_var_MEM = cluster.MEM
-        dendro_var_med = cluster.medians
-        dendro_var_IQR = cluster.IQRs
+        dendro_var_MEM <- cluster.MEM
+        dendro_var_med <- cluster.medians
+        dendro_var_IQR <- cluster.IQRs
         ##Build MEM heatmap with natural language output
         #Get MEM values and the max and min MEM value
-        heatmap_data = (MEM_values[[5]])[[1]]
-        output.dir = "./output files/"
+        heatmap_data <- (MEM_values[[5]])[[1]]
+        output.dir <- "./output files/"
         if (length(which(apply(heatmap_data, 1, function(row) any(row < 0)))) == 0){
-            scale_max = 10
+            scale_max <- 10
             heat_palette_MEM <-
                 colorRampPalette(c("black", "yellow", "#FAF7C9"))
 
@@ -26,8 +26,8 @@ build_heatmaps <-
                 )
             pairs.breaks_MEM <- unique(pairs.breaks_MEM)
         }else{
-            scale_max = 10
-            scale_min = -10
+            scale_max <- 10
+            scale_min <- (-10)
             #Initialize heatmap color palette
             heat_palette_MEM <-
                 colorRampPalette(c("#A8C3F4", "#17499B", "black", "yellow", "#FAF7C9"))
@@ -43,8 +43,8 @@ build_heatmaps <-
             pairs.breaks_MEM <- unique(pairs.breaks_MEM)}
 
         #Initialize heatmap for medians
-        medians_MEM_values = (MEM_values[[1]])[[1]]
-        scale_max = max(medians_MEM_values)
+        medians_MEM_values <- (MEM_values[[1]])[[1]]
+        scale_max <- max(medians_MEM_values)
         heat_palette_med <-
             colorRampPalette(c("black", "yellow", "#FAF7C9"))
         pairs.breaks_med <-
@@ -55,11 +55,11 @@ build_heatmaps <-
         pairs.breaks_med <- unique(pairs.breaks_med)
 
         #Initialize heatmap for IQR
-        medians_MEM_values = (MEM_values[[1]])[[1]]
+        medians_MEM_values <- (MEM_values[[1]])[[1]]
         if (max(medians_MEM_values) <= 2.8) {
-            scale_max = 2.81
+            scale_max <- 2.81
         }else{
-            scale_max = max(medians_MEM_values)
+            scale_max <- max(medians_MEM_values)
         }
         heat_palette_IQR <-
             colorRampPalette(c("black", "yellow", "#FAF7C9"))
@@ -70,11 +70,11 @@ build_heatmaps <-
         pairs.breaks_IQR <- unique(pairs.breaks_IQR)
 
         #Round MEM enrichment vals
-        MEM_vals_scale = as.matrix(round(heatmap_data, 0))
+        MEM_vals_scale <- as.matrix(round(heatmap_data, 0))
         #Initialize variables
         #Call create.labels
-        new_rownames = create.labels(MEM_vals_scale, display.thresh, heatmap_data)
-        new_rownames_txt = create.labels.txt(MEM_vals_scale, display.thresh, heatmap_data)
+        new_rownames <- create.labels(MEM_vals_scale, display.thresh, heatmap_data)
+        new_rownames_txt <- create.labels.txt(MEM_vals_scale, display.thresh, heatmap_data)
         #Specify heatmap clustering parameters
         if (dendro_var_MEM == "both") {
             Colv_var_MEM = TRUE
@@ -128,12 +128,12 @@ build_heatmaps <-
 
         # Print MEM heatmap according to cluster spec
         if (length(which(apply(heatmap_data, 1, function(row) any(row < 0)))) == 0){
-            title_MEM = "   MEM* Heatmap"
+            title_MEM <- "   MEM* Heatmap"
         }else{
-            title_MEM = "   MEM Heatmap"}
+            title_MEM <- "   MEM Heatmap"}
 
 
-        args_heatmap_MEM = list(
+        args_heatmap_MEM <- list(
             heatmap_data,
             main = title_MEM,
             dendrogram = dendro_var_MEM,
@@ -156,7 +156,7 @@ build_heatmaps <-
         )
 
         if (labels == TRUE) {
-            args_heatmap_MEM = c(
+            args_heatmap_MEM <- c(
                 args_heatmap_MEM,
                 list(
                     labRow = new_rownames,
@@ -165,7 +165,7 @@ build_heatmaps <-
                 )
             )
         }else{
-            args_heatmap_MEM = c(
+            args_heatmap_MEM <- c(
                 args_heatmap_MEM,
                 list(
                     margins = c(5, 10)
@@ -175,30 +175,30 @@ build_heatmaps <-
         table <-
             do.call(heatmap.2, args_heatmap_MEM)
 
-        clustered_matrix = heatmap_data[rev(table$rowInd), table$colInd]
-        matrix.test= as.matrix(new_rownames)
-        matrix.test_txt = as.matrix(new_rownames_txt)
+        clustered_matrix <- heatmap_data[rev(table$rowInd), table$colInd]
+        matrix.test<- as.matrix(new_rownames)
+        matrix.test_txt <- as.matrix(new_rownames_txt)
 
         if (length(which(apply(heatmap_data, 1, function(row) any(row < 0)))) >0){
-            enrichment_score_ordered_txt = matrix.test_txt[rev(table$rowInd), ]
+            enrichment_score_ordered_txt <- matrix.test_txt[rev(table$rowInd), ]
         }else{
-            enrichment_score_ordered_txt = matrix.test_txt[rev(table$rowInd), ]}
+            enrichment_score_ordered_txt <- matrix.test_txt[rev(table$rowInd), ]}
 
         if (length(which(apply(heatmap_data, 1, function(row) any(row < 0)))) >0){
-            enrichment_score_ordered = matrix.test[rev(table$rowInd), ]
+            enrichment_score_ordered <- matrix.test[rev(table$rowInd), ]
         }else{
-            enrichment_score_ordered = matrix.test[rev(table$rowInd), ]}
+            enrichment_score_ordered <- matrix.test[rev(table$rowInd), ]}
 
 
         # Print medians heatmap according to cluster spec
-        reorder_medians = as.matrix(MEM_values[[1]][[1]])[rev(table$rowInd), table$colInd]
+        reorder_medians <- as.matrix(MEM_values[[1]][[1]])[rev(table$rowInd), table$colInd]
         # Print IQR heatmap according to cluster spec
-        reorder_IQR = as.matrix(MEM_values[[3]][[1]])[rev(table$rowInd), table$colInd]
+        reorder_IQR <- as.matrix(MEM_values[[3]][[1]])[rev(table$rowInd), table$colInd]
 
         if (only.MEMheatmap == FALSE) {
             # Print median heatmap
 
-            args_heatmap_MEDs = list(
+            args_heatmap_MEDs <- list(
                 main = "Median Heatmap",
                 breaks = pairs.breaks_med,
                 revC = FALSE,
@@ -217,7 +217,7 @@ build_heatmaps <-
             )
 
             if (cluster.medians != "none") {
-                args_heatmap_MEDs = c(
+                args_heatmap_MEDs <- c(
                     list(as.matrix(MEM_values[[1]][[1]])),
                     args_heatmap_MEDs,
                     list(dendrogram = dendro_var_med,
@@ -226,9 +226,9 @@ build_heatmaps <-
                          margins = c(5, 10))
                 )
                 medians_table <- do.call(heatmap.2, args_heatmap_MEDs)
-                reorder_medians = as.matrix(MEM_values[[1]][[1]])[rev(medians_table$rowInd), medians_table$colInd]
+                reorder_medians <- as.matrix(MEM_values[[1]][[1]])[rev(medians_table$rowInd), medians_table$colInd]
             }else{
-                args_heatmap_MEDs = c(
+                args_heatmap_MEDs <- c(
                     list(reorder_medians),
                     args_heatmap_MEDs,
                     list(dendrogram = "none",
@@ -241,7 +241,7 @@ build_heatmaps <-
 
             # Print IQR heatmap
 
-            args_heatmap_IQRs = list(
+            args_heatmap_IQRs <- list(
                 main = "IQR Heatmap",
                 breaks = pairs.breaks_IQR,
                 revC = FALSE,
@@ -260,7 +260,7 @@ build_heatmaps <-
             )
 
             if (cluster.IQRs != "none") {
-                args_heatmap_IQRs = c(
+                args_heatmap_IQRs <- c(
                     list(as.matrix(MEM_values[[3]][[1]])),
                     args_heatmap_IQRs,
                     list(dendrogram = dendro_var_IQR,
@@ -269,9 +269,9 @@ build_heatmaps <-
                          margins = c(5, 10))
                 )
                 IQR_table <- do.call(heatmap.2, args_heatmap_IQRs)
-                reorder_IQR = as.matrix(MEM_values[[3]][[1]])[rev(IQR_table$rowInd), IQR_table$colInd]
+                reorder_IQR <- as.matrix(MEM_values[[3]][[1]])[rev(IQR_table$rowInd), IQR_table$colInd]
             }else{
-                args_heatmap_IQRs = c(
+                args_heatmap_IQRs <- c(
                     list(reorder_IQR),
                     args_heatmap_IQRs,
                     list(dendrogram = "none",
@@ -288,7 +288,7 @@ build_heatmaps <-
         if (output.files == TRUE) {
 
             # file attributes
-            file_prefix = file.path(output.dir, strftime(Sys.time(), "%Y-%m-%d_%H%M%S"))
+            file_prefix <- file.path(output.dir, strftime(Sys.time(), "%Y-%m-%d_%H%M%S"))
 
             # ----- pdf output ----------------------------
 
@@ -340,8 +340,8 @@ build_heatmaps <-
                 )
             }else{
                 filenames <- unlist(MEM_values[[6]])
-                matrix.filenames = as.matrix(filenames)
-                filenames_ordered = matrix.filenames[rev(table$rowInd), ]
+                matrix.filenames <- as.matrix(filenames)
+                filenames_ordered <- matrix.filenames[rev(table$rowInd), ]
                 new_rownames_filenames <-
                     cbind(filenames_ordered, enrichment_score_ordered)
                 colnames(new_rownames_filenames) <- c("File", "MEM label")
@@ -353,11 +353,11 @@ build_heatmaps <-
             }
         }
         if (((MEM_values[[6]])[[1]]) == 0){
-            cat(enrichment_score_ordered_txt, sep = "\n")
+            show(paste("MEM label for cluster",enrichment_score_ordered))
         }else{
             filenames <- unlist(MEM_values[[6]])
-            matrix.filenames = as.matrix(filenames)
-            filenames_ordered = matrix.filenames[rev(table$rowInd), ]
-            cat("File","\n",filenames_ordered, sep = "\n")
-            cat("\n\n","MEM_label",enrichment_score_ordered_txt)}
+            matrix.filenames <- as.matrix(filenames)
+            filenames_ordered <- matrix.filenames[rev(table$rowInd), ]
+            show(filenames_ordered)
+            show(paste("MEM label ",enrichment_score_ordered))}
     }

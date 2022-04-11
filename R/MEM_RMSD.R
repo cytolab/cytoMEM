@@ -6,79 +6,78 @@ MEM_RMSD <-
 
         if (isTRUE(format == "pop files")) {
             infiles <- dir(MEM_matrix)
-            sample_names = as.character(c(seq_len(length(infiles))))
-            RMSD = matrix(nrow = length(infiles), ncol = length(infiles))
-            similarity = matrix(nrow = length(infiles), ncol = length(infiles))
+            sample_names <- as.character(c(seq_len(length(infiles))))
+            RMSD <- matrix(nrow = length(infiles), ncol = length(infiles))
+            similarity <- matrix(nrow = length(infiles), ncol = length(infiles))
 
             for (m in seq_len(length(infiles))) {
                 for (n in seq_len(length(infiles))) {
-                    popA1 = read.table(paste(MEM_matrix, "/", infiles[[m]], sep = ""))
+                    popA1 <- read.table(paste(MEM_matrix, "/", infiles[[m]], sep = ""))
                     if (dim(popA1)[2] == 2) {
-                        popA1 = read.table(paste(MEM_matrix, "/", infiles[[m]], sep = ""),
+                        popA1 <- read.table(paste(MEM_matrix, "/", infiles[[m]], sep = ""),
                                            row.names = 1)
                     }
-                    popB1 = read.table(paste(MEM_matrix, "/", infiles[[n]], sep =
+                    popB1 <- read.table(paste(MEM_matrix, "/", infiles[[n]], sep =
                                                  ""))
                     if (dim(popB1)[2] == 2) {
-                        popB1 = read.table(paste(MEM_matrix, "/", infiles[[n]], sep = ""),
+                        popB1 <- read.table(paste(MEM_matrix, "/", infiles[[n]], sep = ""),
                                            row.names = 1)
                     }
-                    common_markers = Reduce(intersect, list(row.names(popA1), row.names(popB1)))
-                    popA2 = popA1[c(common_markers), ]
-                    popB2 = popB1[c(common_markers), ]
-                    popA = as.vector(t(popA2))
-                    popB = as.vector(t(popB2))
+                    common_markers <- Reduce(intersect, list(row.names(popA1), row.names(popB1)))
+                    popA2 <- popA1[c(common_markers), ]
+                    popB2 <- popB1[c(common_markers), ]
+                    popA <- as.vector(t(popA2))
+                    popB <- as.vector(t(popB2))
 
                     sum_squares = 0
                     for (i in seq_len(length(common_markers))) {
-                        sum_squares = (popA[i] - popB[i]) ^ 2 + sum_squares
-                        #       print(sum_squares)
+                        sum_squares <- (popA[i] - popB[i]) ^ 2 + sum_squares
                     }
-                    RMSD[m, n] = sqrt(sum_squares / length(common_markers))
-                    similarity[m, n] = 100 - (RMSD[m, n] / 20 * 100)
+                    RMSD[m, n] <- sqrt(sum_squares / length(common_markers))
+                    similarity[m, n] <- 100 - (RMSD[m, n] / 20 * 100)
                 }
             }
         } else{
             if (is(MEM_matrix,"list")) {
-                MEM_scores = MEM_matrix[[5]][[1]]
+                MEM_scores <- MEM_matrix[[5]][[1]]
             } else{
-                MEM_scores = MEM_matrix
+                MEM_scores <- MEM_matrix
             }
 
-            sample_names = as.character(row.names(MEM_scores))
+            sample_names <- as.character(row.names(MEM_scores))
 
             if (length(sample_names) == 0) {
-                sample_names = as.character(seq_len(nrow(MEM_scores)))
+                sample_names <- as.character(seq_len(nrow(MEM_scores)))
             }
 
-            RMSD = matrix(nrow = nrow(MEM_scores),
+            RMSD <- matrix(nrow = nrow(MEM_scores),
                           ncol = nrow(MEM_scores))
-            similarity = matrix(nrow = nrow(MEM_scores),
+            similarity <- matrix(nrow = nrow(MEM_scores),
                                 ncol = nrow(MEM_scores))
 
             for (m in seq_len(nrow(MEM_scores))) {
                 for (n in seq_len(nrow(MEM_scores))) {
-                    popA = MEM_scores[m, ]
-                    popB = MEM_scores[n, ]
-                    common_markers = colnames(MEM_scores)
+                    popA <- MEM_scores[m, ]
+                    popB <- MEM_scores[n, ]
+                    common_markers <- colnames(MEM_scores)
 
                     sum_squares = 0
                     for (i in seq_len(length(common_markers))) {
-                        sum_squares = (popA[i] - popB[i]) ^ 2 + sum_squares
+                        sum_squares <- (popA[i] - popB[i]) ^ 2 + sum_squares
                     }
-                    RMSD[m, n] = sqrt(sum_squares / length(common_markers))
-                    similarity[m, n] = 100 - (RMSD[m, n] / 20 * 100)
+                    RMSD[m, n] <- sqrt(sum_squares / length(common_markers))
+                    similarity[m, n] <- 100 - (RMSD[m, n] / 20 * 100)
                 }
             }
         }
-        row.names(similarity) = sample_names
-        colnames(similarity) = sample_names
+        row.names(similarity) <- sample_names
+        colnames(similarity) <- sample_names
 
         heat_palette <-
             colorRampPalette(c("blue", "green", "yellow", "red"))
-        scale_min = min(similarity)
-        scale_max = max(similarity)
-        scale_range = 100 - scale_min
+        scale_min <- min(similarity)
+        scale_max <- max(similarity)
+        scale_range <- 100 - scale_min
 
         pairs.breaks <-
             c(
@@ -106,7 +105,7 @@ MEM_RMSD <-
                 margins = c(7, 15)
             )
 
-        reorder_similarity = as.matrix(similarity[rev(clustered$rowInd), clustered$colInd])
+        reorder_similarity <- as.matrix(similarity[rev(clustered$rowInd), clustered$colInd])
 
         if (output.matrix == TRUE) {
             dir.create(file.path(getwd(), "output files"), showWarnings = FALSE)

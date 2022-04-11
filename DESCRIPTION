@@ -16,7 +16,7 @@ Imports: gplots, tools, flowCore, grDevices, stats, utils, matrixStats, methods
 Collate: 'MEM_function.R''create_labels_txt.R''IQR_thresh.R''build_heatmaps.R''add_cluster_ID.R''add_fileID_to_clusterID.R''choose_reference_pop.R''choose_markers.R''create_labels.R''format_data.R''get_files.R''rename_markers.R''MEM_RMSD.R''zero_reference.R'
 biocViews: Proteomics, SystemsBiology, Classification, FlowCytometry, DataRepresentation, DataImport, CellBiology, SingleCell, Clustering
 Depends:
-    R (>= 4.1)
+    R (>= 4.2.0)
 Suggests: knitr,
     rmarkdown
 VignetteBuilder: knitr
