@@ -12,5 +12,10 @@ citEntry(
   year     = "2017",
   volume   = "14",
   pages    = "275-278",
-  url      = "https://www.nature.com/articles/nmeth.4149"
+  url      = "https://www.nature.com/articles/nmeth.4149",
+  textVersion = paste(
+         "Diggins, K. E., Greenplate, A. R., Leelatian, N., Wogsland, C. E., & Irish, J. M. (2017)",
+         "Characterizing cell subsets using marker enrichment modeling",
+         "Nature methods, 14(3),",
+         "275-278. https://doi.org/10.1038/nmeth.4149")
 )

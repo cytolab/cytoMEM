@@ -5,15 +5,15 @@ IQR_thresh <- function(MAGpop,
                        num_markers) {
     # Automatically calculate an IQR threshold
     #   Use universal IQR threshodling
-    IQR_thresh_pop = matrix()
-    IQR_thresh_ref = matrix()
+    IQR_thresh_pop <- matrix()
+    IQR_thresh_ref <- matrix()
     for (i in seq_len((num_markers - 1))) {
         MAGpop_belowThresh <- MAGpop[, i] <= quantile(MAGpop[, i])[2]
         IQR_thresh_pop[i] <- min(IQRpop[, i][MAGpop_belowThresh])
         MAGref_belowThresh <- MAGref[, i] <= quantile(MAGref[, i])[2]
         IQR_thresh_ref[i] <- min(IQRref[, i][MAGref_belowThresh])
     }
-    IQR.thresh1 = mean(c(IQR_thresh_pop, IQR_thresh_ref))
+    IQR.thresh1 <- mean(c(IQR_thresh_pop, IQR_thresh_ref))
 
     return(IQR.thresh1)
 }
