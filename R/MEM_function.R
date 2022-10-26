@@ -178,17 +178,33 @@ MEM <- function(exp_data, transform=FALSE, cofactor=1, choose.markers=FALSE,mark
 
     if(scale.matrix == "linear"){
         scale_max <- max(abs(MEM_matrix[,c(seq_len(ncol(MEM_matrix)-1))]))
-        MEM_matrix <- cbind((MEM_matrix[,c(seq_len(ncol(MEM_matrix)-1))]/scale_max)*10,MEM_matrix[,ncol(MEM_matrix)])
+        #check if there's only one cluster (will need to transpose since R automatically changes the data format)
+        if (num_pops==1 & zero.ref==TRUE){
+          MEM_matrix = cbind(t(MEM_matrix[,c(1:ncol(MEM_matrix)-1)]/scale_max)*10,MEM_matrix[,ncol(MEM_matrix)])
+        }else{
+          MEM_matrix = cbind((MEM_matrix[,c(1:ncol(MEM_matrix)-1)]/scale_max)*10,MEM_matrix[,ncol(MEM_matrix)])
+        }
     }else if(scale.matrix == "log"){
         scaled_matrix <- log(MEM_matrix,base = exp(scale.factor))
         scale_max <- max(abs(scaled_matrix[,c(seq_len(ncol(scaled_matrix)-1))]))
         scale_min <- min(abs(scaled_matrix[,c(seq_len(ncol(scaled_matrix)-1))]))
-        MEM_matrix <- cbind(((scaled_matrix[,c(seq_len(ncol(scaled_matrix)-1))]-scale_min)/scale_max)*10,scaled_matrix[,ncol(scaled_matrix)])
+        #check if there's only one cluster (will need to transpose since R automatically changes the data format)
+        if (num_pops==1 & zero.ref==TRUE){
+          MEM_matrix = cbind(t((scaled_matrix[,c(1:ncol(scaled_matrix)-1)]-scale_min)/scale_max)*10,scaled_matrix[,ncol(scaled_matrix)])
+        }else{
+          MEM_matrix = cbind(((scaled_matrix[,c(1:ncol(scaled_matrix)-1)]-scale_min)/scale_max)*10,scaled_matrix[,ncol(scaled_matrix)])
+        }
     }else if(scale.matrix == "arcsinh"){
         scaled_matrix <- asinh(MEM_matrix/scale.factor)
         scale_max <- max(abs(scaled_matrix[,c(seq_len(ncol(scaled_matrix)-1))]))
         scale_min <- min(abs(scaled_matrix[,c(seq_len(ncol(scaled_matrix)-1))]))
-        MEM_matrix <- cbind(((scaled_matrix[,c(seq_len(ncol(scaled_matrix)-1))]-scale_min)/scale_max)*10,scaled_matrix[,ncol(scaled_matrix)])}
+        #check if there's only one cluster (will need to transpose since R automatically changes the data format)
+        if (num_pops==1 & zero.ref==TRUE){
+          MEM_matrix = cbind(t((scaled_matrix[,c(1:ncol(scaled_matrix)-1)]-scale_min)/scale_max)*10,scaled_matrix[,ncol(scaled_matrix)])
+        }else{
+          MEM_matrix = cbind(((scaled_matrix[,c(1:ncol(scaled_matrix)-1)]-scale_min)/scale_max)*10,scaled_matrix[,ncol(scaled_matrix)])
+        }
+    }
 
     #Rename rows and columns of all matrices
     rename_table <- function(x){
@@ -198,11 +214,19 @@ MEM <- function(exp_data, transform=FALSE, cofactor=1, choose.markers=FALSE,mark
     }
 
     # Apply rename_table function across matrices
-    object_list_labeled <- lapply(list(MAGpop[,seq_len(c(length(marker_names)-1))],
-                                       MAGref[,seq_len(c(length(marker_names)-1))],
-                                       IQRpop[,seq_len(c(length(marker_names)-1))],
-                                       IQRref[,seq_len(c(length(marker_names)-1))],
-                                       MEM_matrix[,seq_len(c(length(marker_names))-1)]),rename_table)
+    if (num_pops==1 & zero.ref==TRUE){ #if there's only one cluster we'll need to transpose since R automatically changes teh data format
+      object_list_labeled <- lapply(list(t(as.matrix(MAGpop[,1:length(marker_names)-1])),
+                                         t(as.matrix(MAGref[,1:length(marker_names)-1])),
+                                         t(as.matrix(IQRpop[,1:length(marker_names)-1])),
+                                         t(as.matrix(IQRref[,1:length(marker_names)-1])),
+                                         t(as.matrix(MEM_matrix[,1:length(marker_names)-1]))),rename_table)
+    }else{
+      object_list_labeled <- lapply(list(as.matrix(MAGpop[,1:length(marker_names)-1]),
+                                         as.matrix(MAGref[,1:length(marker_names)-1]),
+                                         as.matrix(IQRpop[,1:length(marker_names)-1]),
+                                         as.matrix(IQRref[,1:length(marker_names)-1]),
+                                         as.matrix(MEM_matrix[,1:length(marker_names)-1])),rename_table)
+    }
     object_list_labeled[[6]] <- file_order
 
     # List all matrices for export
