@@ -15,6 +15,10 @@ MEM <- function(exp_data, transform=FALSE, cofactor=1, choose.markers=FALSE,mark
       }else{
         warning("Incorrect data type. See documentation for accepted data types",call.=FALSE)
         return(exp_data)
+      }
+    if(length(unique(exp_data$cluster))==1 & zero.ref==FALSE){ #trying to run regular MEM on a single cluster
+      warning("You cannot run referenced MEM on a single cluster. Either use multiple clusters as input or run zero.ref MEM",call.=FALSE)
+      return(exp_data)
     }
 
     #Check to see if there are multiple file types in folder if input is filenames

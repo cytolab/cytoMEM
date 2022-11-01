@@ -175,12 +175,12 @@ build_heatmaps <-
         
         #create the MEM heatmap
         if (nrow(MEM_values[[1]][[1]])==1){ #check for one cluster
-          markers=colnames(heatmap_data) #get marker names
-          cluster=rownames(heatmap_data) #get cluster name
-          values=heatmap_data[1,] #get MEM scores
+          markers <- colnames(heatmap_data) #get marker names
+          cluster <- rownames(heatmap_data) #get cluster name
+          values <- heatmap_data[1,] #get MEM scores
           df <- data.frame(x=markers, y=cluster, z=values)
-          
-          print(ggplot(df, aes(markers, cluster)) + geom_tile(aes(fill= values)) + scale_fill_gradientn(colors = heat_palette_MEM(100), limits=c(0, 10)) + labs(title=title_MEM, x=element_blank(), y=element_blank()) + theme_classic() + theme(axis.text.x = element_text(angle = 90,hjust=0.95,vjust=0.3), axis.ticks.x=element_blank(), axis.ticks.y=element_blank(), axis.line=element_blank()))
+          MEM.heatmap <- ggplot(df, aes(markers, cluster)) + geom_tile(aes(fill= values)) + scale_fill_gradientn(colors = heat_palette_MEM(100), limits=c(0, 10)) + labs(title=title_MEM, x=element_blank(), y=element_blank()) + theme_classic() + theme(axis.text.x = element_text(angle = 90,hjust=0.95,vjust=0.3), axis.ticks.x=element_blank(), axis.ticks.y=element_blank(), axis.line=element_blank())
+          print(MEM.heatmap) #output the MEM heatmap to the console
           
           #set some variables for later
           table <- list(rowInd=NA, colInd=NA)
@@ -250,10 +250,11 @@ build_heatmaps <-
                 )
                 #create heatmap
                 if (nrow(MEM_values[[1]][[1]])==1){ #check if one cluster
-                  # image(z=t(MEM_values[[1]][[1]]), main = "Median Heatmap", col = pal) #console.output
-                  values=MEM_values[[1]][[1]]
-                  df <- data.frame(x=markers, y=cluster, z=values)
-                  print(ggplot(df, aes(markers, cluster)) + geom_tile(aes(fill= values)) + scale_fill_gradientn(colors = heat_palette_MEM(100), limits=c(0, scale_max_med)) + labs(title="Median Heatmap", x=element_blank(), y=element_blank()) + theme_classic() + theme(axis.text.x = element_text(angle = 90,hjust=0.95,vjust=0.3), axis.ticks.x=element_blank(), axis.ticks.y=element_blank(), axis.line=element_blank()))
+                  values <- MEM_values[[1]][[1]] #pull median values
+                  df <- data.frame(x=markers, y=cluster, z=values) #same markers and cluster as MEM heatmap
+                  med.heatmap <- ggplot(df, aes(markers, cluster)) + geom_tile(aes(fill= values)) + scale_fill_gradientn(colors = heat_palette_MEM(100), limits=c(0, scale_max_med)) + labs(title="Median Heatmap", x=element_blank(), y=element_blank()) + theme_classic() + theme(axis.text.x = element_text(angle = 90,hjust=0.95,vjust=0.3), axis.ticks.x=element_blank(), axis.ticks.y=element_blank(), axis.line=element_blank())
+                  print(med.heatmap) #output the median heatmap to the console
+                  
                   medians_table <- list(rowInd=NA, colInd=NA)
                   medians_table$rowInd <- 1
                   medians_table$colInd <- c(1:ncol(MEM_values[[1]][[1]]))
@@ -272,13 +273,10 @@ build_heatmaps <-
                 )
                 #create heatmap
                 if (nrow(MEM_values[[1]][[1]])==1){ #check if one cluster
-                  # image(z=t(MEM_values[[1]][[1]]), main = "Median Heatmap", col = pal) #console output
-                  values=MEM_values[[1]][[1]]
-                  df <- data.frame(x=markers, y=cluster, z=values)
-                  print(ggplot(df, aes(markers, cluster)) + geom_tile(aes(fill= values)) + scale_fill_gradientn(colors = heat_palette_MEM(100), limits=c(0, scale_max_med)) + labs(title="Median Heatmap", x=element_blank(), y=element_blank()) + theme_classic() + theme(axis.text.x = element_text(angle = 90,hjust=0.95,vjust=0.3), axis.ticks.x=element_blank(), axis.ticks.y=element_blank(), axis.line=element_blank()))
-                  table2 <- list(rowInd=NA, colInd=NA)
-                  table2$rowInd <- 1
-                  table2$colInd <- rev(c(1:ncol(MEM_values[[1]][[1]])))
+                  values <- MEM_values[[1]][[1]] #pull median values
+                  df <- data.frame(x=markers, y=cluster, z=values) #same markers and cluster as MEM heatmap
+                  med.heatmap <- ggplot(df, aes(markers, cluster)) + geom_tile(aes(fill= values)) + scale_fill_gradientn(colors = heat_palette_MEM(100), limits=c(0, scale_max_med)) + labs(title="Median Heatmap", x=element_blank(), y=element_blank()) + theme_classic() + theme(axis.text.x = element_text(angle = 90,hjust=0.95,vjust=0.3), axis.ticks.x=element_blank(), axis.ticks.y=element_blank(), axis.line=element_blank())
+                  print(med.heatmap) #output the median heatmap to the console
                 }else{
                   table2 <- do.call(heatmap.2, args_heatmap_MEDs)
                 }
@@ -314,10 +312,11 @@ build_heatmaps <-
                 )
                 #create IQR heatmap
                 if (nrow(MEM_values[[1]][[1]])==1){ #check if one cluster
-                  # image(z=t(MEM_values[[3]][[1]]), main = "IQR Heatmap", col = pal) #console output
-                  values=MEM_values[[3]][[1]]
-                  df <- data.frame(x=markers, y=cluster, z=values)
-                  print(ggplot(df, aes(markers, cluster)) + geom_tile(aes(fill= values)) + scale_fill_gradientn(colors = heat_palette_MEM(100), limits=c(0, scale_max_IQR)) + labs(title="IQR Heatmap", x=element_blank(), y=element_blank()) + theme_classic() + theme(axis.text.x = element_text(angle = 90,hjust=0.95,vjust=0.3), axis.ticks.x=element_blank(), axis.ticks.y=element_blank(), axis.line=element_blank()))
+                  values <- MEM_values[[3]][[1]] #pull IQR values
+                  df <- data.frame(x=markers, y=cluster, z=values) #same markers and cluster as MEM heatmap
+                  IQR.heatmap <- ggplot(df, aes(markers, cluster)) + geom_tile(aes(fill= values)) + scale_fill_gradientn(colors = heat_palette_MEM(100), limits=c(0, scale_max_IQR)) + labs(title="IQR Heatmap", x=element_blank(), y=element_blank()) + theme_classic() + theme(axis.text.x = element_text(angle = 90,hjust=0.95,vjust=0.3), axis.ticks.x=element_blank(), axis.ticks.y=element_blank(), axis.line=element_blank())
+                  print(IQR.heatmap) #output the IQR heatmap to the console
+                  
                   IQR_table <- list(rowInd=NA, colInd=NA)
                   IQR_table$rowInd <- 1
                   IQR_table$colInd <- c(1:ncol(MEM_values[[1]][[1]]))
@@ -337,13 +336,10 @@ build_heatmaps <-
                 )
                 #create IQR heatmap
                 if (nrow(MEM_values[[1]][[1]])==1){ #check if one cluster
-                  # image(z=t(MEM_values[[3]][[1]]), main = "IQR Heatmap", col = pal) #console output
-                  values=MEM_values[[3]][[1]]
-                  df <- data.frame(x=markers, y=cluster, z=values)
-                  print(ggplot(df, aes(markers, cluster)) + geom_tile(aes(fill= values)) + scale_fill_gradientn(colors = heat_palette_MEM(100), limits=c(0, scale_max_IQR)) + labs(title="IQR Heatmap", x=element_blank(), y=element_blank()) + theme_classic() + theme(axis.text.x = element_text(angle = 90,hjust=0.95,vjust=0.3), axis.ticks.x=element_blank(), axis.ticks.y=element_blank(), axis.line=element_blank()))
-                  table3 <- list(rowInd=NA, colInd=NA)
-                  table3$rowInd <- 1
-                  table3$colInd <- c(1:ncol(MEM_values[[1]][[1]]))
+                  values <- MEM_values[[3]][[1]] #pull IQR values
+                  df <- data.frame(x=markers, y=cluster, z=values) #same markers and cluster as MEM heatmap
+                  IQR.heatmap <- ggplot(df, aes(markers, cluster)) + geom_tile(aes(fill= values)) + scale_fill_gradientn(colors = heat_palette_MEM(100), limits=c(0, scale_max_IQR)) + labs(title="IQR Heatmap", x=element_blank(), y=element_blank()) + theme_classic() + theme(axis.text.x = element_text(angle = 90,hjust=0.95,vjust=0.3), axis.ticks.x=element_blank(), axis.ticks.y=element_blank(), axis.line=element_blank())
+                  print(IQR.heatmap) #output the IQR heatmap to the console
                 }else{
                   table3 <- do.call(heatmap.2, args_heatmap_IQRs)
                 }
@@ -362,10 +358,7 @@ build_heatmaps <-
 
             # MEM heatmap plot
             if (nrow(MEM_values[[1]][[1]])==1){ #check if one cluster
-              # image(z=t(heatmap_data), main = title_MEM, col = pal) 
-              values= heatmap_data[1,]
-              df <- data.frame(x=markers, y=cluster, z=values)
-              print(ggplot(df, aes(markers, cluster)) + geom_tile(aes(fill= values)) + scale_fill_gradientn(colors = heat_palette_MEM(100), limits=c(0, 10)) + labs(title=title_MEM, x=element_blank(), y=element_blank()) + theme_classic() + theme(axis.text.x = element_text(angle = 90,hjust=0.95,vjust=0.3), axis.ticks.x=element_blank(), axis.ticks.y=element_blank(), axis.line=element_blank()))
+              print(MEM.heatmap)
             }else{
               do.call(heatmap.2, args_heatmap_MEM)
             }
@@ -373,15 +366,9 @@ build_heatmaps <-
             if (only.MEMheatmap == FALSE) {
               if (nrow(MEM_values[[1]][[1]])==1){ #check if one cluster
                 # Plot median heatmap
-                # image(z=t(MEM_values[[1]][[1]]), main = "Median Heatmap", col = pal)
-                values=MEM_values[[1]][[1]] 
-                df <- data.frame(x=markers, y=cluster, z=values)
-                print(ggplot(df, aes(markers, cluster)) + geom_tile(aes(fill= values)) + scale_fill_gradientn(colors = heat_palette_MEM(100), limits=c(0, scale_max_med)) + labs(title="Median Heatmap", x=element_blank(), y=element_blank()) + theme_classic() + theme(axis.text.x = element_text(angle = 90,hjust=0.95,vjust=0.3), axis.ticks.x=element_blank(), axis.ticks.y=element_blank(), axis.line=element_blank()))
+                print(med.heatmap)
                 # Plot IQR heatmap
-                # image(z=t(MEM_values[[3]][[1]]), main = "IQR Heatmap", col = pal) 
-                values=MEM_values[[3]][[1]] 
-                df <- data.frame(x=markers, y=cluster, z=values)
-                print(ggplot(df, aes(markers, cluster)) + geom_tile(aes(fill= values)) + scale_fill_gradientn(colors = heat_palette_MEM(100), limits=c(0, scale_max_IQR)) + labs(title="IQR Heatmap", x=element_blank(), y=element_blank()) + theme_classic() + theme(axis.text.x = element_text(angle = 90,hjust=0.95,vjust=0.3), axis.ticks.x=element_blank(), axis.ticks.y=element_blank(), axis.line=element_blank()))
+                print(IQR.heatmap)
               }else{
                 # Plot median heatmap
                 do.call(heatmap.2, args_heatmap_MEDs)
