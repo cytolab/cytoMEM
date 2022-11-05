@@ -10,4 +10,5 @@ importFrom('stats', 'IQR', 'median', 'quantile')
 importFrom('utils', 'read.table', 'write.table')
 importFrom('matrixStats','colIQRs')
 importFrom("methods", "is")
+importFrom("ggplot2", "ggplot")
 
