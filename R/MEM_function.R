@@ -1,23 +1,23 @@
 MEM <- function(exp_data, transform=FALSE, cofactor=1, choose.markers=FALSE,markers="all",choose.ref=FALSE,zero.ref=FALSE,rename.markers=FALSE,new.marker.names="none",file.is.clust=FALSE,add.fileID=FALSE,IQR.thresh=NULL,output.prescaled.MEM=FALSE,scale.matrix = "linear",scale.factor = 0)
 {
-    if (file.is.clust == TRUE) {
-        file_order <- exp_data}else {file_order <- 0}
+    #determine if the input contains filenames for files that have cluster-specific data with no cluster ID column
+    if (file.is.clust == TRUE) {file_order <- exp_data}else {file_order <- 0}
 
     # Check user input
-    if(missing(exp_data)){
+    if(missing(exp_data)){ #data is missing
         warning("Data not found. See documentation for accepted data types",call.=FALSE)
     }
-    if(is(exp_data,"character") && missing(file.is.clust) && length(exp_data) > 1){
+    if(is(exp_data,"character") && missing(file.is.clust) && length(exp_data) > 1){ #input is a filename and file.is.clust parameter is missing
         warning("There are multiple files. Please specify if each file is cluster using file.is.clust arg",call.=FALSE)
         return(exp_data)
     }
-    if(is(exp_data,"character") || is(exp_data,"matrix") || is(exp_data,"data.frame")){
+    if(is(exp_data,"character") || is(exp_data,"matrix") || is(exp_data,"data.frame")){ 
       }else{
         warning("Incorrect data type. See documentation for accepted data types",call.=FALSE)
         return(exp_data)
     }
 
-    #Check to see if there are multiple file types in folder
+    #Check to see if there are multiple file types in folder if input is filenames
     if(is(exp_data,"character")){
         all_exts <- lapply(exp_data,file_ext)
         if(isTRUE(all.equal(all_exts,rep(all_exts[1],length(all_exts))))==FALSE){
@@ -47,35 +47,39 @@ MEM <- function(exp_data, transform=FALSE, cofactor=1, choose.markers=FALSE,mark
         }
     }
     # Get markers to include in analysis and extract column names
-    marker_names <- as.vector(c(colnames(exp_data)[seq_len(ncol(exp_data)-1)],"cluster"))
-    if(choose.markers==TRUE){
-        markerList <- choose_markers(exp_data)}else if(choose.markers == FALSE && markers == "all"){
-            markerList<-c(seq_len(ncol(exp_data)))}else{sep_vals <- unlist(strsplit(markers,","))
-            list_vals <- vector()
-            for(i in seq_len(length(sep_vals))){
-                val <- sep_vals[i]
-                if(length(unlist(strsplit(val,":"))) > 1){
-                    new_val <- as.numeric(unlist(strsplit(val,":"))[1]):as.numeric(unlist(strsplit(val,":"))[2])
-                }else{
-                    new_val<-as.numeric(sep_vals[i])
-                }
-                list_vals <- c(list_vals,new_val)
+    marker_names <- as.vector(c(colnames(exp_data)[seq_len(ncol(exp_data)-1)],"cluster")) #exclude cluster column
+    if(choose.markers==TRUE){ #user will input which columns to include via the console
+        markerList <- choose_markers(exp_data)
+    }else if(choose.markers == FALSE && markers == "all"){ #use all columns 
+        markerList<-c(seq_len(ncol(exp_data)))
+    }else{ #parse the markers argument input for column numbers to include
+        sep_vals <- unlist(strsplit(markers,",")) #assuming comma-separated input
+        list_vals <- vector()
+        for(i in seq_len(length(sep_vals))){
+            val <- sep_vals[i]
+            if(length(unlist(strsplit(val,":"))) > 1){ #check for a run of columns (e.g., 1:5)
+                new_val <- as.numeric(unlist(strsplit(val,":"))[1]):as.numeric(unlist(strsplit(val,":"))[2])
+            }else{
+                new_val<-as.numeric(sep_vals[i])
             }
-            markerList <- c(list_vals,ncol(exp_data))
-            }
+            list_vals <- c(list_vals,new_val)
+        }
+        markerList <- c(list_vals,ncol(exp_data))
+    }
 
+    #extract only the columns specified above
     exp_data <- as.data.frame(as.data.frame(exp_data)[,c(markerList)])
     marker_names <- colnames(exp_data)
 
     # Rename markers
-    if(rename.markers==TRUE){
+    if(rename.markers==TRUE){ #user will specify new marker names via the console
         new_marker_names <- rename_markers(exp_data,marker_names)
-    }else if(rename.markers==FALSE && new.marker.names=="none"){
+    }else if(rename.markers==FALSE && new.marker.names=="none"){ #user does not want to rename the markers
         new_marker_names <- marker_names
-    }else{
+    }else{ #user supplied new marker names in a comma-separated list
         user_input_names <- new.marker.names
         new_marker_names <- as.character(unlist(strsplit(user_input_names,",")))
-        if(length(new_marker_names)!=(length(marker_names)-1)){
+        if(length(new_marker_names)!=(length(marker_names)-1)){ #check that the number of markers match
             warning("Number of new marker names does not match number of markers.",call.=FALSE,immediate.=TRUE)
             new_marker_names <- rename_markers(exp_data,marker_names)
         }
@@ -94,9 +98,9 @@ MEM <- function(exp_data, transform=FALSE, cofactor=1, choose.markers=FALSE,mark
     pop_names <- unique(exp_data$cluster)
 
     MAGpop <- matrix(nrow=num_pops,ncol=num_markers)
-    MAGref <- matrix(nrow=num_pops,ncol=num_markers)
+    MAGref <- matrix(nrow=num_pops,ncol=num_markers-1) #exclude cluster column
     IQRpop <- matrix(nrow=num_pops,ncol=num_markers)
-    IQRref <- matrix(nrow=num_pops,ncol=num_markers)
+    IQRref <- matrix(nrow=num_pops,ncol=num_markers-1) #exclude cluster column
 
     # Transform values if specified
     if(transform==TRUE){
@@ -113,16 +117,16 @@ MEM <- function(exp_data, transform=FALSE, cofactor=1, choose.markers=FALSE,mark
     }
 
     # Get reference population medians and IQRs
-    if(choose.ref==TRUE){
-        altRef_vals <- choose_ref(exp_data,pop_names,num_pops,num_markers)
+    if(choose.ref==TRUE){ #user will specify which cluster to use as the reference cluster
+        altRef_vals = choose.ref(exp_data[,1:ncol(exp_data)-1],pop_names,num_pops,num_markers) #exclude cluster column
         MAGref <- altRef_vals[[1]]
         IQRref <- altRef_vals[[2]]
         zero.ref == FALSE
-    }else if(zero.ref==TRUE){
-        zeroRef_vals <- zero_ref(exp_data,num_pops,num_markers)
+    }else if(zero.ref==TRUE){ #referenceless MEM
+        zeroRef_vals <- zero_ref(exp_data[,1:ncol(exp_data)-1],num_pops,num_markers) #exclude cluster column
         MAGref <- zeroRef_vals[[1]]
         IQRref <- zeroRef_vals[[2]]
-    }else{
+    }else{ #reference population for each cluster will include every other cluster
         for(i in seq_len(num_pops)){
             pop <- pop_names[i]
             MAGref[i,] <- abs(apply(subset(exp_data,cluster!=pop),2,FUN=median,na.rm=TRUE))
@@ -144,16 +148,17 @@ MEM <- function(exp_data, transform=FALSE, cofactor=1, choose.markers=FALSE,mark
         IQR.thresh<-IQR_thresh(MAGpop,MAGref,IQRpop,IQRref,num_markers)
     }
 
-    for(i in seq_len((num_markers-1))){
+    for(i in seq_len((num_markers-1))){ #exclude cluster column
         IQRpop[,i] <- pmax(IQRpop[,i],IQR.thresh)
         IQRref[,i] <- pmax(IQRref[,i],IQR.thresh)
     }
 
+    #calculate the second term in the MEM equation
     IQRcomp <- (IQRref/IQRpop)-1
     # If IQRpop > IQRref, set IQRcomp to 0 (IQRcomp will only be less than 0 if IQRpop > IQRref)
     IQRcomp[IQRcomp<0] <- 0
 
-
+    #remove the second term in the MEM equation (IQRcomp) if the population's median value is very low (1.44)
     if(zero.ref == TRUE){
         IQRcomp[(MAGpop<1.44)] <- 0}
 
@@ -164,6 +169,7 @@ MEM <- function(exp_data, transform=FALSE, cofactor=1, choose.markers=FALSE,mark
     # If MAGpop < MAGref or MAGpop = MAGref, negate MEM score (i.e. if MAGdiff = 0)
     MEM_matrix[!(MAG_diff>=0)] <- (-MEM_matrix[!(MAG_diff>=0)])
 
+    #remove any negative MEM scores for referenceless MEM
     if(zero.ref == TRUE){
         MEM_matrix[MEM_matrix<0] <- 0}
 
@@ -186,18 +192,23 @@ MEM <- function(exp_data, transform=FALSE, cofactor=1, choose.markers=FALSE,mark
 
     #Rename rows and columns of all matrices
     rename_table <- function(x){
-        colnames(x) <- marker_names[seq_len((length(marker_names)-1))]
+        colnames(x) <- marker_names[seq_len((length(marker_names)-1))] #exclude cluster column
         rownames(x) <- pop_names
         return(x)
     }
 
     # Apply rename_table function across matrices
-    object_list_labeled <- lapply(list(MAGpop[,seq_len(c(length(marker_names)-1))],MAGref[,seq_len(c(length(marker_names)-1))],IQRpop[,seq_len(c(length(marker_names)-1))],IQRref[,seq_len(c(length(marker_names)-1))],MEM_matrix[,seq_len(c(length(marker_names))-1)]),rename_table)
+    object_list_labeled <- lapply(list(MAGpop[,seq_len(c(length(marker_names)-1))],
+                                       MAGref[,seq_len(c(length(marker_names)-1))],
+                                       IQRpop[,seq_len(c(length(marker_names)-1))],
+                                       IQRref[,seq_len(c(length(marker_names)-1))],
+                                       MEM_matrix[,seq_len(c(length(marker_names))-1)]),rename_table)
     object_list_labeled[[6]] <- file_order
 
-    #     # List all matrices for export
+    # List all matrices for export
     all_values <- list("MAGpop" = object_list_labeled[1],"MAGref"=object_list_labeled[2],"IQRpop"=object_list_labeled[3],"IQRref"=object_list_labeled[4],"MEM_matrix"=object_list_labeled[5],"File Order" = object_list_labeled[6])
-
+    
+    #export pre-scaled MEM values
     if(output.prescaled.MEM == TRUE){
         colnames(prescaled_MEM_matrix) <- marker_names
         dir.create(file.path(getwd(), "output files"), showWarnings = FALSE)
