@@ -1,4 +1,4 @@
-MEM <- function(exp_data, transform=FALSE, cofactor=1, choose.markers=FALSE,markers="all",choose.ref=FALSE,zero.ref=FALSE,rename.markers=FALSE,new.marker.names="none",file.is.clust=FALSE,add.fileID=FALSE,IQR.thresh=NULL,output.prescaled.MEM=FALSE,scale.matrix = "linear",scale.factor = 0)
+MEM <- function(exp_data, transform=FALSE, cofactor=1, choose.markers=FALSE,markers="all",choose.ref=FALSE,zero.ref=FALSE,rename.markers=FALSE,new.marker.names="none",file.is.clust=FALSE,add.fileID=FALSE,IQR.thresh=NULL,output.prescaled.MEM=FALSE,scale.matrix = "linear",scale.factor = 0, input.ref='')
 {
     #determine if the input contains filenames for files that have cluster-specific data with no cluster ID column
     if (file.is.clust == TRUE) {file_order <- exp_data}else {file_order <- 0}
@@ -137,6 +137,15 @@ MEM <- function(exp_data, transform=FALSE, cofactor=1, choose.markers=FALSE,mark
             IQRref[i,] <- apply(subset(exp_data,cluster!=pop),2,FUN=IQR,na.rm=TRUE)
             idx <- which(exp_data[,"cluster"] != pop)
         }
+    }
+    #check if user supplied refernce IQR values to use
+    if (input.ref[1] != ''){
+      #check that list is the same length as number of channels (excluding the cluster column)
+      if (length(input.ref)!=ncol(exp_data)){
+        warning("Number of input reference IQRs does not match the number of channels. 
+                Make sure you included a 0 at the end for the cluster column.",call.=FALSE)
+      }
+      IQRref <- t(as.matrix(input.ref)) #overwrite IQRref with input values
     }
 
     # Set and apply IQR threshold
