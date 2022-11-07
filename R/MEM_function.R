@@ -78,7 +78,7 @@ MEM <- function(exp_data, transform=FALSE, cofactor=1, choose.markers=FALSE,mark
     # Rename markers
     if(rename.markers==TRUE){ #user will specify new marker names via the console
         new_marker_names <- rename_markers(exp_data,marker_names)
-    }else if(rename.markers==FALSE && new.marker.names=="none"){ #user does not want to rename the markers
+    }else if(rename.markers==FALSE && new.marker.names[1]=="none"){ #user does not want to rename the markers
         new_marker_names <- marker_names
     }else{ #user supplied new marker names in a comma-separated list
         user_input_names <- new.marker.names
