@@ -240,18 +240,21 @@ MEM <- function(exp_data, transform=FALSE, cofactor=1, choose.markers=FALSE,mark
                                          t(as.matrix(MAGref[,1:length(marker_names)-1])),
                                          t(as.matrix(IQRpop[,1:length(marker_names)-1])),
                                          t(as.matrix(IQRref[,1:length(marker_names)-1])),
-                                         t(as.matrix(MEM_matrix[,1:length(marker_names)-1]))),rename_table)
+                                         t(as.matrix(MEM_matrix[,1:length(marker_names)-1])),
+                                         t(as.matrix(prescaled_MEM_matrix[,1:length(marker_names)-1]))), rename_table)
     }else{
       object_list_labeled <- lapply(list(as.matrix(MAGpop[,1:length(marker_names)-1]),
                                          as.matrix(MAGref[,1:length(marker_names)-1]),
                                          as.matrix(IQRpop[,1:length(marker_names)-1]),
                                          as.matrix(IQRref[,1:length(marker_names)-1]),
-                                         as.matrix(MEM_matrix[,1:length(marker_names)-1])),rename_table)
+                                         as.matrix(MEM_matrix[,1:length(marker_names)-1]), 
+                                         as.matrix(prescaled_MEM_matrix[,1:length(marker_names)-1])), rename_table)
     }
+    object_list_labeled[[7]] <- object_list_labeled[[6]] #move prescaled MEM matrix to element 7
     object_list_labeled[[6]] <- file_order
 
     # List all matrices for export
-    all_values <- list("MAGpop" = object_list_labeled[1],"MAGref"=object_list_labeled[2],"IQRpop"=object_list_labeled[3],"IQRref"=object_list_labeled[4],"MEM_matrix"=object_list_labeled[5],"File Order" = object_list_labeled[6])
+    all_values <- list("MAGpop" = object_list_labeled[1],"MAGref"=object_list_labeled[2],"IQRpop"=object_list_labeled[3],"IQRref"=object_list_labeled[4],"MEM_matrix"=object_list_labeled[5], "File Order" = object_list_labeled[6], "prescaled_MEM_matrix"=object_list_labeled[7]
     
     #export pre-scaled MEM values
     if(output.prescaled.MEM == TRUE){
