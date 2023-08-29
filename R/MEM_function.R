@@ -254,7 +254,7 @@ MEM <- function(exp_data, transform=FALSE, cofactor=1, choose.markers=FALSE,mark
     object_list_labeled[[6]] <- file_order
 
     # List all matrices for export
-    all_values <- list("MAGpop" = object_list_labeled[1],"MAGref"=object_list_labeled[2],"IQRpop"=object_list_labeled[3],"IQRref"=object_list_labeled[4],"MEM_matrix"=object_list_labeled[5], "File Order" = object_list_labeled[6], "prescaled_MEM_matrix"=object_list_labeled[7]
+    all_values <- list("MAGpop" = object_list_labeled[1],"MAGref"=object_list_labeled[2],"IQRpop"=object_list_labeled[3],"IQRref"=object_list_labeled[4],"MEM_matrix"=object_list_labeled[5], "File Order" = object_list_labeled[6], "prescaled_MEM_matrix"=object_list_labeled[7])
     
     #export pre-scaled MEM values
     if(output.prescaled.MEM == TRUE){
