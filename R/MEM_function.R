@@ -1,4 +1,4 @@
-MEM <- function(exp_data, transform=FALSE, cofactor=1, choose.markers=FALSE,markers="all",choose.ref=FALSE,zero.ref=FALSE,rename.markers=FALSE,new.marker.names="none",file.is.clust=FALSE,add.fileID=FALSE,IQR.thresh=NULL,output.prescaled.MEM=FALSE,scale.matrix = "linear",scale.factor = 0)
+MEM <- function(exp_data, transform=FALSE, cofactor=1, choose.markers=FALSE,markers="all",choose.ref=FALSE,zero.ref=FALSE,rename.markers=FALSE,new.marker.names="none",file.is.clust=FALSE,add.fileID=FALSE,IQR.thresh=NULL,output.prescaled.MEM=FALSE,scale.matrix = "linear",scale.factor = 0, input.IQR.ref='')
 {
     #determine if the input contains filenames for files that have cluster-specific data with no cluster ID column
     if (file.is.clust == TRUE) {file_order <- exp_data}else {file_order <- 0}
@@ -78,7 +78,7 @@ MEM <- function(exp_data, transform=FALSE, cofactor=1, choose.markers=FALSE,mark
     # Rename markers
     if(rename.markers==TRUE){ #user will specify new marker names via the console
         new_marker_names <- rename_markers(exp_data,marker_names)
-    }else if(rename.markers==FALSE && new.marker.names=="none"){ #user does not want to rename the markers
+    }else if(rename.markers==FALSE && new.marker.names[1]=="none"){ #user does not want to rename the markers
         new_marker_names <- marker_names
     }else{ #user supplied new marker names in a comma-separated list
         user_input_names <- new.marker.names
@@ -102,9 +102,9 @@ MEM <- function(exp_data, transform=FALSE, cofactor=1, choose.markers=FALSE,mark
     pop_names <- unique(exp_data$cluster)
 
     MAGpop <- matrix(nrow=num_pops,ncol=num_markers)
-    MAGref <- matrix(nrow=num_pops,ncol=num_markers-1) #exclude cluster column
+    MAGref <- matrix(nrow=num_pops,ncol=num_markers) 
     IQRpop <- matrix(nrow=num_pops,ncol=num_markers)
-    IQRref <- matrix(nrow=num_pops,ncol=num_markers-1) #exclude cluster column
+    IQRref <- matrix(nrow=num_pops,ncol=num_markers) 
 
     # Transform values if specified
     if(transform==TRUE){
@@ -137,6 +137,23 @@ MEM <- function(exp_data, transform=FALSE, cofactor=1, choose.markers=FALSE,mark
             IQRref[i,] <- apply(subset(exp_data,cluster!=pop),2,FUN=IQR,na.rm=TRUE)
             idx <- which(exp_data[,"cluster"] != pop)
         }
+    }
+    #check if user supplied refernce IQR values to use
+    if (input.IQR.ref[1] != ''){
+      if (zero.ref != TRUE){ #make sure user is running zero.ref MEM
+        warning("You can only specify an IQR reference value when using zero.ref MEM. For referenced MEM, the IQR reference must be calculated from the reference population. If you wish to set a constant reference population for referenced MEM, use the choose.ref parameter instead.", call.=FALSE)
+      }
+      #check that the user supplied a single number to be used as the reference IQR value
+      if (is.numeric(input.IQR.ref)==FALSE | length(input.IQR.ref) != 1){ #TRUE if input.IQR.ref is not a number or if it is a list
+        warning("Please supply a single number to be used as the IQR reference value. This IQR reference value should represent a typical IQR value from your dataset containing multiple subsets of cells. To estimate a typical IQR value, calculate the IQR of each feature in the dataset, then take the median of those IQR values.", call.=FALSE)
+      }
+      
+      IQRref <- matrix(input.IQR.ref, nrow=num_pops,ncol=num_markers)
+
+    }else{ #user did not supply an IQR reference value to use
+      if (num_pops==1){
+        warning("You are attempting to run zero.ref MEM on one cluster. It is unlikely that the IQR values for a single cluster are an accurate representation of the IQR values for the entire dataset that this cluster comes from. We recommend that you use the input.IQR.ref parameter to specify an IQR reference value that represents a typical IQR value from the entire dataset that contains multiple subsets of cells. To estimate a typical IQR value, calculate the IQR of each feature in the dataset, then take the median of those IQR values.", call.=FALSE)
+      }
     }
 
     # Set and apply IQR threshold
@@ -218,23 +235,26 @@ MEM <- function(exp_data, transform=FALSE, cofactor=1, choose.markers=FALSE,mark
     }
 
     # Apply rename_table function across matrices
-    if (num_pops==1 & zero.ref==TRUE){ #if there's only one cluster we'll need to transpose since R automatically changes teh data format
+    if (num_pops==1 & zero.ref==TRUE){ #if there's only one cluster we'll need to transpose since R automatically changes the data format
       object_list_labeled <- lapply(list(t(as.matrix(MAGpop[,1:length(marker_names)-1])),
                                          t(as.matrix(MAGref[,1:length(marker_names)-1])),
                                          t(as.matrix(IQRpop[,1:length(marker_names)-1])),
                                          t(as.matrix(IQRref[,1:length(marker_names)-1])),
-                                         t(as.matrix(MEM_matrix[,1:length(marker_names)-1]))),rename_table)
+                                         t(as.matrix(MEM_matrix[,1:length(marker_names)-1])),
+                                         t(as.matrix(prescaled_MEM_matrix[,1:length(marker_names)-1]))), rename_table)
     }else{
       object_list_labeled <- lapply(list(as.matrix(MAGpop[,1:length(marker_names)-1]),
                                          as.matrix(MAGref[,1:length(marker_names)-1]),
                                          as.matrix(IQRpop[,1:length(marker_names)-1]),
                                          as.matrix(IQRref[,1:length(marker_names)-1]),
-                                         as.matrix(MEM_matrix[,1:length(marker_names)-1])),rename_table)
+                                         as.matrix(MEM_matrix[,1:length(marker_names)-1]), 
+                                         as.matrix(prescaled_MEM_matrix[,1:length(marker_names)-1])), rename_table)
     }
+    object_list_labeled[[7]] <- object_list_labeled[[6]] #move prescaled MEM matrix to element 7
     object_list_labeled[[6]] <- file_order
 
     # List all matrices for export
-    all_values <- list("MAGpop" = object_list_labeled[1],"MAGref"=object_list_labeled[2],"IQRpop"=object_list_labeled[3],"IQRref"=object_list_labeled[4],"MEM_matrix"=object_list_labeled[5],"File Order" = object_list_labeled[6])
+    all_values <- list("MAGpop" = object_list_labeled[1],"MAGref"=object_list_labeled[2],"IQRpop"=object_list_labeled[3],"IQRref"=object_list_labeled[4],"MEM_matrix"=object_list_labeled[5], "File Order" = object_list_labeled[6], "prescaled_MEM_matrix"=object_list_labeled[7])
     
     #export pre-scaled MEM values
     if(output.prescaled.MEM == TRUE){
